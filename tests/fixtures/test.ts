@@ -21,22 +21,19 @@ type PageFixtures = {
 
 export const test = base.extend<PageFixtures>({
   page: async ({ page }, use) => {
-    // Google GPT intercepts navigation clicks and calls history.pushState /
-    // history.replaceState to add #google_vignette to the URL before showing
-    // the vignette overlay. Block those calls so the original click can proceed.
-    // The hashchange listener is a fallback for any path that bypasses the API.
-    await page.addInitScript(() => {
-      const origPush = history.pushState.bind(history);
+    // Google Publisher Tag (gpt.js) registers a document-level click interceptor
+    // that calls event.preventDefault() and injects #google_vignette into the URL
+    // before showing a full-page ad, blocking the intended navigation entirely.
+    // Aborting the script prevents the interceptor from ever being registered.
+    await page.route(/gpt\.js/, route => route.abort());
+
+    // If GPT loads from an unrecognised URL, clear any #google_vignette hash so
+    // subsequent toPass retries see a clean URL and can attempt navigation again.
+    // Uses function syntax to avoid TypeScript optional-param syntax being
+    // serialised into the browser context where it would be a syntax error.
+    await page.addInitScript(function() {
       const origReplace = history.replaceState.bind(history);
-      history.pushState = (data, unused, url?) => {
-        if (typeof url === 'string' && url.includes('google_vignette')) return;
-        origPush(data, unused, url);
-      };
-      history.replaceState = (data, unused, url?) => {
-        if (typeof url === 'string' && url.includes('google_vignette')) return;
-        origReplace(data, unused, url);
-      };
-      window.addEventListener('hashchange', () => {
+      window.addEventListener('hashchange', function() {
         if (location.hash.includes('google_vignette'))
           origReplace(null, '', location.pathname + location.search);
       });
@@ -46,9 +43,14 @@ export const test = base.extend<PageFixtures>({
       page.getByRole('button', { name: 'Consent' }),
       async (btn) => { await btn.click(); },
     );
-    // Fallback for when the vignette renders an iframe despite the script above.
-    // Google wraps its ad iframes in <ins> elements; chain into the nested frame
-    // to reach the close button (no visible text, selected by role only).
+    // Dismiss vignette overlays that appear despite the route block. Google serves
+    // two ad formats with different iframe structures:
+    //   Video ads  — single iframe level: ins > iframe > button
+    //   Banner ads — nested iframe level: ins > iframe > iframe > button
+    await page.addLocatorHandler(
+      page.frameLocator('ins > iframe').getByRole('button').first(),
+      async (btn) => { await btn.click(); },
+    );
     await page.addLocatorHandler(
       page.frameLocator('ins > iframe').frameLocator('iframe').getByRole('button'),
       async (btn) => { await btn.click(); },
