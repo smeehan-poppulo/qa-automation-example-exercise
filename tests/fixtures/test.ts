@@ -21,14 +21,36 @@ type PageFixtures = {
 
 export const test = base.extend<PageFixtures>({
   page: async ({ page }, use) => {
+    // Google GPT intercepts navigation clicks and calls history.pushState /
+    // history.replaceState to add #google_vignette to the URL before showing
+    // the vignette overlay. Block those calls so the original click can proceed.
+    // The hashchange listener is a fallback for any path that bypasses the API.
+    await page.addInitScript(() => {
+      const origPush = history.pushState.bind(history);
+      const origReplace = history.replaceState.bind(history);
+      history.pushState = (data, unused, url?) => {
+        if (typeof url === 'string' && url.includes('google_vignette')) return;
+        origPush(data, unused, url);
+      };
+      history.replaceState = (data, unused, url?) => {
+        if (typeof url === 'string' && url.includes('google_vignette')) return;
+        origReplace(data, unused, url);
+      };
+      window.addEventListener('hashchange', () => {
+        if (location.hash.includes('google_vignette'))
+          origReplace(null, '', location.pathname + location.search);
+      });
+    });
+
     await page.addLocatorHandler(
       page.getByRole('button', { name: 'Consent' }),
       async (btn) => { await btn.click(); },
     );
-    // The vignette close button lives inside a nested iframe and has no visible
-    // text — chain frameLocator into the inner iframe and target by role.
+    // Fallback for when the vignette renders an iframe despite the script above.
+    // Google wraps its ad iframes in <ins> elements; chain into the nested frame
+    // to reach the close button (no visible text, selected by role only).
     await page.addLocatorHandler(
-      page.frameLocator('#google_vignette').frameLocator('iframe').getByRole('button'),
+      page.frameLocator('ins > iframe').frameLocator('iframe').getByRole('button'),
       async (btn) => { await btn.click(); },
     );
     await use(page);
