@@ -34,7 +34,7 @@ test.describe('Product Detail Page', { tag: ['@ui', '@regression'] }, () => {
     await expect(productDetailPage.addToCartButton).toBeVisible();
   });
 
-  test('adds product to cart and shows modal', { tag: '@smoke' }, async ({ productDetailPage, page }) => {
+  test('adds product to cart and shows modal', { tag: '@smoke' }, async ({ productDetailPage }) => {
     await productDetailPage.addToCart();
     await expect(productDetailPage.cartModal).toBeVisible();
   });

@@ -23,7 +23,7 @@ test.describe('Products Page', { tag: ['@ui', '@regression'] }, () => {
     await expect(productsPage.searchInput).toBeVisible();
   });
 
-  test('searches for a product and shows results', async ({ productsPage, page }) => {
+  test('searches for a product and shows results', async ({ productsPage }) => {
     await productsPage.searchFor('Top');
     await expect(productsPage.searchedProductsHeading).toBeVisible();
     await expect(productsPage.productCards.first()).toBeVisible();
@@ -31,11 +31,10 @@ test.describe('Products Page', { tag: ['@ui', '@regression'] }, () => {
     expect(count).toBeGreaterThan(0);
   });
 
-  test('search for non-matching term shows no products', async ({ productsPage, page }) => {
+  test('search for non-matching term shows no products', async ({ productsPage }) => {
     await productsPage.searchFor('xyznotarealproduct12345');
     await expect(productsPage.searchedProductsHeading).toBeVisible();
-    const count = await productsPage.productCards.count();
-    expect(count).toBe(0);
+    await expect(productsPage.productCards).toHaveCount(0);
   });
 
   test('each product card has a View Product link', async ({ productsPage }) => {

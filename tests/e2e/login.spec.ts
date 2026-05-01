@@ -29,18 +29,18 @@ test.describe('Login / Signup Page', { tag: ['@ui', '@regression'] }, () => {
     await expect(loginPage.signupButton).toBeVisible();
   });
 
-  test('shows error for invalid login credentials', { tag: '@smoke' }, async ({ loginPage, page }) => {
+  test('shows error for invalid login credentials', { tag: '@smoke' }, async ({ loginPage }) => {
     await loginPage.login('invalid@example.com', 'wrongpassword');
     await expect(loginPage.loginErrorMessage).toBeVisible();
   });
 
-  test('shows error when logging in with empty email', async ({ loginPage, page }) => {
+  test('shows error when logging in with empty email', async ({ loginPage }) => {
     await loginPage.login('', 'somepassword');
     // Browser validation prevents submission — email field is required
     await expect(loginPage.loginEmailInput).toBeFocused();
   });
 
-  test('shows error for existing email on signup', async ({ loginPage, page }) => {
+  test('shows error for existing email on signup', async ({ loginPage }) => {
     // Use a known existing account email from the site
     await loginPage.signup('Test User', 'test@test.com');
     await expect(loginPage.signupErrorMessage).toBeVisible();

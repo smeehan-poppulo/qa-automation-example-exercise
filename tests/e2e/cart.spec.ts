@@ -1,7 +1,7 @@
 import { test, expect } from '../fixtures/test';
 
 test.describe('Cart Page', { tag: ['@ui', '@regression'] }, () => {
-  test('shows empty cart message when no items added', async ({ cartPage, page }) => {
+  test('shows empty cart message when no items added', async ({ cartPage }) => {
     await cartPage.goto();
     await expect(cartPage.emptyCartMessage).toBeVisible();
     await expect(cartPage.shoppingCartBreadcrumb).toBeVisible();
@@ -35,7 +35,7 @@ test.describe('Cart Page', { tag: ['@ui', '@regression'] }, () => {
     await expect(cartPage.cartItems).toHaveCount(1);
   });
 
-  test('cart shows product name and price', async ({ productDetailPage, cartPage, page }) => {
+  test('cart shows product name and price', async ({ productDetailPage, cartPage }) => {
     await productDetailPage.goto(1);
     await productDetailPage.addToCart();
     await productDetailPage.viewCartModalLink.click();
@@ -45,7 +45,7 @@ test.describe('Cart Page', { tag: ['@ui', '@regression'] }, () => {
     await expect(cartItem.getByText('Rs. 500').first()).toBeVisible();
   });
 
-  test('cart displays Proceed To Checkout button when items present', async ({ productDetailPage, cartPage, page }) => {
+  test('cart displays Proceed To Checkout button when items present', async ({ productDetailPage, cartPage }) => {
     await productDetailPage.goto(1);
     await productDetailPage.addToCart();
     await productDetailPage.viewCartModalLink.click();
