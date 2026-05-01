@@ -5,6 +5,8 @@ import { ProductDetailPage } from '../pages/ProductDetailPage';
 import { CartPage } from '../pages/CartPage';
 import { LoginPage } from '../pages/LoginPage';
 import { ContactPage } from '../pages/ContactPage';
+import { CheckoutPage } from '../pages/CheckoutPage';
+import { PaymentPage } from '../pages/PaymentPage';
 
 type PageFixtures = {
   homePage: HomePage;
@@ -13,16 +15,19 @@ type PageFixtures = {
   cartPage: CartPage;
   loginPage: LoginPage;
   contactPage: ContactPage;
+  checkoutPage: CheckoutPage;
+  paymentPage: PaymentPage;
 };
 
 export const test = base.extend<PageFixtures>({
   page: async ({ page }, use) => {
-    // Auto-dismiss GDPR consent dialog whenever it appears
     await page.addLocatorHandler(
       page.getByRole('button', { name: 'Consent' }),
-      async (btn) => {
-        await btn.click();
-      },
+      async (btn) => { await btn.click(); },
+    );
+    await page.addLocatorHandler(
+      page.frameLocator('#google_vignette').getByText('Close'),
+      async (close) => { await close.click(); },
     );
     await use(page);
   },
@@ -49,6 +54,14 @@ export const test = base.extend<PageFixtures>({
 
   contactPage: async ({ page }, use) => {
     await use(new ContactPage(page));
+  },
+
+  checkoutPage: async ({ page }, use) => {
+    await use(new CheckoutPage(page));
+  },
+
+  paymentPage: async ({ page }, use) => {
+    await use(new PaymentPage(page));
   },
 });
 
