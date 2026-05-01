@@ -1,6 +1,6 @@
 import { test, expect } from '../fixtures/test';
 
-test.describe('Login / Signup Page', () => {
+test.describe('Login / Signup Page', { tag: ['@ui', '@regression'] }, () => {
   test.beforeEach(async ({ loginPage }) => {
     await loginPage.goto();
   });
@@ -29,7 +29,7 @@ test.describe('Login / Signup Page', () => {
     await expect(loginPage.signupButton).toBeVisible();
   });
 
-  test('shows error for invalid login credentials', async ({ loginPage, page }) => {
+  test('shows error for invalid login credentials', { tag: '@smoke' }, async ({ loginPage, page }) => {
     await loginPage.login('invalid@example.com', 'wrongpassword');
     await expect(loginPage.loginErrorMessage).toBeVisible();
   });

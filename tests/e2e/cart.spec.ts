@@ -1,6 +1,6 @@
 import { test, expect } from '../fixtures/test';
 
-test.describe('Cart Page', () => {
+test.describe('Cart Page', { tag: ['@ui', '@regression'] }, () => {
   test('shows empty cart message when no items added', async ({ cartPage, page }) => {
     await cartPage.goto();
     await expect(cartPage.emptyCartMessage).toBeVisible();
@@ -24,7 +24,7 @@ test.describe('Cart Page', () => {
     await expect(page).toHaveURL(/\/products/);
   });
 
-  test('shows product in cart after adding from product detail', async ({ productDetailPage, cartPage, page }) => {
+  test('shows product in cart after adding from product detail', { tag: '@smoke' }, async ({ productDetailPage, cartPage, page }) => {
     await productDetailPage.goto(1);
     await productDetailPage.addToCart();
     await expect(productDetailPage.cartModal).toBeVisible();

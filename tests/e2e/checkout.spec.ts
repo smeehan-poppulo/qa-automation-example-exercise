@@ -1,7 +1,7 @@
 import { test, expect } from '../fixtures/authenticated';
 
-test.describe('Checkout flow (authenticated)', () => {
-  test('logged-in user can purchase a product end-to-end', async ({
+test.describe('Checkout flow (authenticated)', { tag: ['@ui', '@e2e', '@regression'] }, () => {
+  test('logged-in user can purchase a product end-to-end', { tag: '@smoke' }, async ({
     productDetailPage,
     cartPage,
     checkoutPage,

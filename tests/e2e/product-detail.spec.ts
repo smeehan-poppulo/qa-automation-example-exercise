@@ -1,6 +1,6 @@
 import { test, expect } from '../fixtures/test';
 
-test.describe('Product Detail Page', () => {
+test.describe('Product Detail Page', { tag: ['@ui', '@regression'] }, () => {
   test.beforeEach(async ({ productDetailPage }) => {
     await productDetailPage.goto(1);
   });
@@ -34,7 +34,7 @@ test.describe('Product Detail Page', () => {
     await expect(productDetailPage.addToCartButton).toBeVisible();
   });
 
-  test('adds product to cart and shows modal', async ({ productDetailPage, page }) => {
+  test('adds product to cart and shows modal', { tag: '@smoke' }, async ({ productDetailPage, page }) => {
     await productDetailPage.addToCart();
     await expect(productDetailPage.cartModal).toBeVisible();
   });

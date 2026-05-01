@@ -19,7 +19,7 @@ const BASE_USER = {
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('User Account API', () => {
+test.describe('User Account API', { tag: ['@api', '@regression'] }, () => {
   let testEmail: string;
   const testPassword = 'ApiTest123!';
 
@@ -48,7 +48,7 @@ test.describe('User Account API', () => {
     expect(body.message).toContain('Email already exist');
   });
 
-  test('GET /api/getUserDetailByEmail returns user data', async ({ request }) => {
+  test('GET /api/getUserDetailByEmail returns user data', { tag: '@smoke' }, async ({ request }) => {
     const response = await request.get('/api/getUserDetailByEmail', {
       params: { email: testEmail },
     });
@@ -100,7 +100,7 @@ test.describe('User Account API', () => {
   });
 });
 
-test.describe('Delete Account API', () => {
+test.describe('Delete Account API', { tag: ['@api', '@regression'] }, () => {
   test('DELETE /api/deleteAccount removes the user', async ({ request }) => {
     const email = `delete_test_${Date.now()}@example.com`;
     const password = 'Delete123!';

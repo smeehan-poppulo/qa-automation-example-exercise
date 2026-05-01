@@ -1,11 +1,11 @@
 import { test, expect } from '../fixtures/test';
 
-test.describe('Home Page', () => {
+test.describe('Home Page', { tag: ['@ui', '@regression'] }, () => {
   test.beforeEach(async ({ homePage }) => {
     await homePage.goto();
   });
 
-  test('has correct page title', async ({ page }) => {
+  test('has correct page title', { tag: '@smoke' }, async ({ page }) => {
     await expect(page).toHaveTitle('Automation Exercise');
   });
 

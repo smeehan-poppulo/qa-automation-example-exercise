@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Verify Login API', () => {
+test.describe('Verify Login API', { tag: ['@api', '@regression'] }, () => {
   test('POST with invalid credentials returns 404 user not found', async ({ request }) => {
     const response = await request.post('/api/verifyLogin', {
       form: { email: 'nosuchuser@notreal.com', password: 'wrongpassword' },
@@ -39,7 +39,7 @@ test.describe('Verify Login API', () => {
     expect(body.message).toBe('This request method is not supported.');
   });
 
-  test('POST with valid credentials returns 200 user exists', async ({ request }) => {
+  test('POST with valid credentials returns 200 user exists', { tag: '@smoke' }, async ({ request }) => {
     // Create a known account, verify login, then clean up
     const email = `authtest_${Date.now()}@example.com`;
     const password = 'AuthTest123!';

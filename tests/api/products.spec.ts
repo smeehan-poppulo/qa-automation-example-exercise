@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Products API', () => {
-  test('GET /api/productsList returns 200 with products array', async ({ request }) => {
+test.describe('Products API', { tag: ['@api', '@regression'] }, () => {
+  test('GET /api/productsList returns 200 with products array', { tag: '@smoke' }, async ({ request }) => {
     const response = await request.get('/api/productsList');
     const body = await response.json();
 
@@ -34,8 +34,8 @@ test.describe('Products API', () => {
   });
 });
 
-test.describe('Brands API', () => {
-  test('GET /api/brandsList returns 200 with brands array', async ({ request }) => {
+test.describe('Brands API', { tag: ['@api', '@regression'] }, () => {
+  test('GET /api/brandsList returns 200 with brands array', { tag: '@smoke' }, async ({ request }) => {
     const response = await request.get('/api/brandsList');
     const body = await response.json();
 
@@ -64,8 +64,8 @@ test.describe('Brands API', () => {
   });
 });
 
-test.describe('Search Product API', () => {
-  test('POST /api/searchProduct with search term returns matching products', async ({ request }) => {
+test.describe('Search Product API', { tag: ['@api', '@regression'] }, () => {
+  test('POST /api/searchProduct with search term returns matching products', { tag: '@smoke' }, async ({ request }) => {
     const response = await request.post('/api/searchProduct', {
       form: { search_product: 'top' },
     });

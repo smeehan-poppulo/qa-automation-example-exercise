@@ -1,6 +1,6 @@
 import { test, expect } from '../fixtures/test';
 
-test.describe('Products Page', () => {
+test.describe('Products Page', { tag: ['@ui', '@regression'] }, () => {
   test.beforeEach(async ({ productsPage }) => {
     await productsPage.goto();
   });
@@ -13,7 +13,7 @@ test.describe('Products Page', () => {
     await expect(productsPage.allProductsHeading).toBeVisible();
   });
 
-  test('displays product list with multiple items', async ({ productsPage }) => {
+  test('displays product list with multiple items', { tag: '@smoke' }, async ({ productsPage }) => {
     await expect(productsPage.productCards.first()).toBeVisible();
     const count = await productsPage.productCards.count();
     expect(count).toBeGreaterThan(5);
