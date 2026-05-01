@@ -43,7 +43,8 @@ test.describe('Products Page', { tag: ['@ui', '@regression'] }, () => {
 
   test('navigates to product detail page via View Product link', async ({ productsPage, page }) => {
     await productsPage.viewProductLinks.first().click();
-    await expect(page).toHaveURL(/\/product_details\/\d+/);
+    // Extended timeout: Google vignette may intercept the click and delay navigation
+    await expect(page).toHaveURL(/\/product_details\/\d+/, { timeout: 15000 });
     await expect(page).toHaveTitle('Automation Exercise - Product Details');
   });
 

@@ -25,9 +25,11 @@ export const test = base.extend<PageFixtures>({
       page.getByRole('button', { name: 'Consent' }),
       async (btn) => { await btn.click(); },
     );
+    // The vignette close button lives inside a nested iframe and has no visible
+    // text — chain frameLocator into the inner iframe and target by role.
     await page.addLocatorHandler(
-      page.frameLocator('#google_vignette').getByText('Close'),
-      async (close) => { await close.click(); },
+      page.frameLocator('#google_vignette').frameLocator('iframe').getByRole('button'),
+      async (btn) => { await btn.click(); },
     );
     await use(page);
   },

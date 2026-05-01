@@ -21,7 +21,8 @@ test.describe('Cart Page', { tag: ['@ui', '@regression'] }, () => {
   test('empty cart shop link navigates to products', async ({ cartPage, page }) => {
     await cartPage.goto();
     await page.getByRole('link', { name: 'here' }).click();
-    await expect(page).toHaveURL(/\/products/);
+    // Extended timeout: Google vignette may intercept the click and delay navigation
+    await expect(page).toHaveURL(/\/products/, { timeout: 15000 });
   });
 
   test('shows product in cart after adding from product detail', { tag: '@smoke' }, async ({ productDetailPage, cartPage, page }) => {
