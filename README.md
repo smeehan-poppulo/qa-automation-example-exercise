@@ -186,6 +186,7 @@ The workflow lives at `.github/workflows/ci.yml` and runs on every push to `main
 |---|---|---|
 | `check` | Every trigger | Typecheck (`tsc --noEmit`) + lint (`eslint`) — fast, no browser install |
 | `test` | After `check` passes | Playwright tests — smoke on PRs, full regression on push to main |
+| `deploy` | After `test`, push/dispatch only | Publishes the HTML report to GitHub Pages |
 
 ### Test scope per trigger
 
@@ -197,13 +198,23 @@ The workflow lives at `.github/workflows/ci.yml` and runs on every push to `main
 
 ### Setup required
 
-Add `TEST_ACCOUNT_PASSWORD` as a repository secret in **Settings → Secrets and variables → Actions**. This is the password used when creating ephemeral test accounts in global setup.
+1. Add `TEST_ACCOUNT_PASSWORD` as a repository secret in **Settings → Secrets and variables → Actions**. This is the password used when creating ephemeral test accounts in global setup.
 
+2. Enable GitHub Pages in **Settings → Pages → Build and deployment**, set the source to **GitHub Actions**. No branch or folder selection is needed — the workflow handles publishing via `actions/deploy-pages`.
+
+### Test reports
+
+| Trigger | Where to find the report |
+|---|---|
+| Push to `main` / manual dispatch | **GitHub Pages** — `https://<org>.github.io/<repo>/` — always reflects the latest regression run |
+| Pull request | **Actions artifact** — open the run, scroll to *Artifacts*, download `playwright-report-<run-id>` |
+
+The Pages URL is also shown as the deployment link on the Actions summary page and in the repository's *Deployments* panel on the right-hand sidebar.
 
 ### Artifacts
 
 After each run:
-- **Playwright HTML report** — always uploaded, retained for 30 days, linked from the Actions summary
+- **Playwright HTML report** — push/dispatch: deployed to GitHub Pages; PRs: uploaded as an artifact retained for 30 days
 - **Test results** (screenshots + traces) — uploaded on failure only, retained for 7 days
 
 ### Runtime environment

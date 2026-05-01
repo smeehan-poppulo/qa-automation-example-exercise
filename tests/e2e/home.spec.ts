@@ -30,19 +30,20 @@ test.describe('Home Page', { tag: ['@ui', '@regression'] }, () => {
 
   test('navigates to products page via nav link', async ({ homePage, page }) => {
     await homePage.navProducts.click();
-    await expect(page).toHaveURL(/\/products/);
+    // Extended timeout: Google vignette may intercept the click and delay navigation
+    await expect(page).toHaveURL(/\/products/, { timeout: 15000 });
     await expect(page.getByRole('heading', { name: 'All Products' })).toBeVisible();
   });
 
   test('navigates to login page via nav link', async ({ homePage, page }) => {
     await homePage.navSignupLogin.click();
-    await expect(page).toHaveURL(/\/login/);
+    await expect(page).toHaveURL(/\/login/, { timeout: 15000 });
     await expect(page.getByRole('heading', { name: 'Login to your account' })).toBeVisible();
   });
 
   test('navigates to contact page via nav link', async ({ homePage, page }) => {
     await homePage.navContactUs.click();
-    await expect(page).toHaveURL(/\/contact_us/);
+    await expect(page).toHaveURL(/\/contact_us/, { timeout: 15000 });
     await expect(page.getByRole('heading', { name: /Contact Us/i })).toBeVisible();
   });
 });

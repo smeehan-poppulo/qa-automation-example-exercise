@@ -7,7 +7,17 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Cancel a previous run for the same branch when new commits are pushed
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Cancel in-progress CI runs for the same branch on new pushes.
+# Pages deployments use their own concurrency group (cancel-in-progress: false)
+# to avoid tearing down a deployment mid-flight.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -67,13 +77,21 @@ jobs:
         env:
           TEST_ACCOUNT_PASSWORD: ${{ secrets.TEST_ACCOUNT_PASSWORD }}
 
+      # PRs: upload as a regular artifact (forks cannot deploy to Pages)
       - name: Upload Playwright HTML report
         uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && github.event_name == 'pull_request'
         with:
           name: playwright-report-${{ github.run_id }}
           path: playwright-report/
           retention-days: 30
+
+      # Push to main / manual dispatch: package for GitHub Pages deployment
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        if: always() && github.event_name != 'pull_request'
+        with:
+          path: playwright-report/
 
       - name: Upload test results on failure
         uses: actions/upload-artifact@v4
@@ -82,3 +100,19 @@ jobs:
           name: test-results-${{ github.run_id }}
           path: test-results/
           retention-days: 7
+
+  deploy:
+    name: Deploy Report to GitHub Pages
+    needs: test
+    if: always() && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
