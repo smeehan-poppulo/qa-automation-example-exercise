@@ -204,10 +204,10 @@ The workflow lives at `.github/workflows/ci.yml` and runs on every push to `main
 
 ### Test reports
 
-| Trigger | Where to find the report |
-|---|---|
-| Push to `main` / manual dispatch | **GitHub Pages** — `https://<org>.github.io/<repo>/` — always reflects the latest regression run |
-| Pull request | **Actions artifact** — open the run, scroll to *Artifacts*, download `playwright-report-<run-id>` |
+| Trigger | Where to find the report                                                                                                                             |
+|---|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Push to `main` / manual dispatch | **GitHub Pages** — [playwright report](https://smeehan-poppulo.github.io/qa-automation-example-exercise) — always reflects the latest regression run |
+| Pull request | **Actions artifact** — open the run, scroll to *Artifacts*, download `playwright-report-<run-id>`                                                    |
 
 The Pages URL is also shown as the deployment link on the Actions summary page and in the repository's *Deployments* panel on the right-hand sidebar.
 
