@@ -1,11 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
+import { cpus } from 'os';
 
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: cpus().length,
   reporter: 'html',
 
   globalSetup: './tests/global-setup.ts',
@@ -40,10 +41,7 @@ export default defineConfig({
     {
       name: 'authenticated-chromium',
       testMatch: '**/e2e/checkout.spec.ts',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json',
-      },
+      use: { ...devices['Desktop Chrome'] },
     },
   ],
 });
