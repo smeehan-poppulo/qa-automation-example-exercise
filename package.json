@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prepare": "husky",
+    "typecheck": "tsc --noEmit",
     "test": "playwright test",
     "test:smoke": "playwright test --grep @smoke",
     "test:regression": "playwright test --grep @regression",
@@ -17,6 +19,7 @@
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.59.1",
-    "@types/node": "^25.6.0"
+    "@types/node": "^25.6.0",
+    "husky": "^9.1.7"
   }
 }

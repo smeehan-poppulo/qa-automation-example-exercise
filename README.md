@@ -48,6 +48,29 @@ cp .env.example .env
 |---|---|---|
 | `TEST_ACCOUNT_PASSWORD` | Yes | Password used when creating ephemeral test accounts in global setup. Falls back to a placeholder locally; must be injected via your secrets manager in CI. |
 
+## Type Checking and Pre-commit Hook
+
+Type checking runs via:
+
+```bash
+npm run typecheck
+```
+
+A pre-commit hook (husky) runs this automatically on every commit. It is installed as part of `npm install` via the `prepare` lifecycle script — no manual setup needed after cloning.
+
+The hook runs `tsc --noEmit` only. Playwright tests are intentionally excluded from the hook because they hit a live site and would take minutes per commit.
+
+### Path aliases
+
+`tsconfig.json` defines two aliases for use in new code:
+
+| Alias | Resolves to |
+|---|---|
+| `@pages/*` | `tests/pages/*` |
+| `@fixtures/*` | `tests/fixtures/*` |
+
+Playwright's built-in TypeScript transpiler honours these automatically — no additional runtime package is required.
+
 ## Running Tests
 
 ### By tag (recommended)
