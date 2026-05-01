@@ -21,11 +21,13 @@ type PageFixtures = {
 
 export const test = base.extend<PageFixtures>({
   page: async ({ page }, use) => {
-    // Google Publisher Tag (gpt.js) registers a document-level click interceptor
-    // that calls event.preventDefault() and injects #google_vignette into the URL
-    // before showing a full-page ad, blocking the intended navigation entirely.
-    // Aborting the script prevents the interceptor from ever being registered.
-    await page.route(/gpt\.js/, route => route.abort());
+    // Google Publisher Tag registers a document-level click interceptor that calls
+    // event.preventDefault() and injects #google_vignette before showing a full-page ad.
+    // Block it from all known CDN origins so the interceptor never registers.
+    await page.route(
+      /googletagservices\.com|securepubads\.g\.doubleclick\.net|pagead2\.googlesyndication\.com|gpt\.js/,
+      route => route.abort(),
+    );
 
     // If GPT loads from an unrecognised URL, clear any #google_vignette hash so
     // subsequent toPass retries see a clean URL and can attempt navigation again.
@@ -52,7 +54,7 @@ export const test = base.extend<PageFixtures>({
       async (btn) => { await btn.click(); },
     );
     await page.addLocatorHandler(
-      page.frameLocator('ins > iframe').frameLocator('iframe').getByRole('button'),
+      page.frameLocator('ins > iframe').frameLocator('iframe').getByRole('button').first(),
       async (btn) => { await btn.click(); },
     );
     await use(page);
