@@ -7,7 +7,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: cpus().length,
-  reporter: 'html',
+  reporter: process.env.CI ? [['github'], ['html']] : 'html',
 
   globalSetup: './tests/global-setup.ts',
   globalTeardown: './tests/global-teardown.ts',

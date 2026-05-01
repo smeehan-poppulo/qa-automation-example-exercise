@@ -1,5 +1,7 @@
 # QA Automation Example Exercise
 
+![CI](https://github.com/smeehan-poppulo/qa-automation-example-exercise/actions/workflows/ci.yml/badge.svg)
+
 Playwright test suite for [automationexercise.com](https://automationexercise.com) — a practice site for QA automation engineers. Covers API contracts, core UI journeys, and a full authenticated checkout flow across Chromium, Firefox, and WebKit.
 
 ## Test Coverage
@@ -48,17 +50,26 @@ cp .env.example .env
 |---|---|---|
 | `TEST_ACCOUNT_PASSWORD` | Yes | Password used when creating ephemeral test accounts in global setup. Falls back to a placeholder locally; must be injected via your secrets manager in CI. |
 
-## Type Checking and Pre-commit Hook
-
-Type checking runs via:
+## Type Checking, Linting and Pre-commit Hook
 
 ```bash
-npm run typecheck
+npm run typecheck   # tsc --noEmit
+npm run lint        # eslint .
 ```
 
-A pre-commit hook (husky) runs this automatically on every commit. It is installed as part of `npm install` via the `prepare` lifecycle script — no manual setup needed after cloning.
+A pre-commit hook (husky) runs both automatically on every commit. It is installed as part of `npm install` via the `prepare` lifecycle script — no manual setup needed after cloning.
 
-The hook runs `tsc --noEmit` only. Playwright tests are intentionally excluded from the hook because they hit a live site and would take minutes per commit.
+Playwright tests are intentionally excluded from the hook because they hit a live site and would take minutes per commit.
+
+### ESLint setup
+
+| Package | Role |
+|---|---|
+| `eslint` + `typescript-eslint` | Core linting with full TypeScript-aware rules |
+| `eslint-plugin-playwright` | Playwright-specific rules (no focused tests, prefer web-first assertions, etc.) |
+| `eslint-config-prettier` | Disables ESLint formatting rules that would conflict with Prettier if added later |
+
+Configuration lives in `eslint.config.mjs` (ESLint v9 flat config).
 
 ### Path aliases
 
@@ -164,6 +175,42 @@ tests/
 playwright/.auth/           Gitignored — storageState files written by global setup
 .env.example                Documents required environment variables
 ```
+
+## CI (GitHub Actions)
+
+The workflow lives at `.github/workflows/ci.yml` and runs on every push to `main`, every pull request, and on manual dispatch.
+
+### Jobs
+
+| Job | Runs on | What it does |
+|---|---|---|
+| `check` | Every trigger | Typecheck (`tsc --noEmit`) + lint (`eslint`) — fast, no browser install |
+| `test` | After `check` passes | Playwright tests — smoke on PRs, full regression on push to main |
+
+### Test scope per trigger
+
+| Trigger | Tests run | Why |
+|---|---|---|
+| Pull request | `@smoke` | Fast feedback — covers all layers without running the full suite |
+| Push to `main` | `@regression` | Full confidence after merge |
+| Manual dispatch | `@regression` | On-demand full run |
+
+### Setup required
+
+Add `TEST_ACCOUNT_PASSWORD` as a repository secret in **Settings → Secrets and variables → Actions**. This is the password used when creating ephemeral test accounts in global setup.
+
+
+### Artifacts
+
+After each run:
+- **Playwright HTML report** — always uploaded, retained for 30 days, linked from the Actions summary
+- **Test results** (screenshots + traces) — uploaded on failure only, retained for 7 days
+
+### Runtime environment
+
+The `test` job runs inside the official Playwright Docker image (`mcr.microsoft.com/playwright:v{version}-noble`) rather than a bare `ubuntu-latest` runner. The image has every browser binary and its OS-level dependencies pre-installed, removing the need for a browser install or cache step in CI.
+
+The image tag is pinned in `.github/workflows/ci.yml` and must be kept in sync with the `@playwright/test` version in `package.json` when that dependency is bumped.
 
 ## Key Decisions
 
