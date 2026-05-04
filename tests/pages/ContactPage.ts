@@ -43,8 +43,7 @@ export class ContactPage extends BasePage {
     await this.page.goto(this.url);
     // Retry once with a short delay if the site returns its "under heavy load" page.
     // The existing CI retries fire immediately; this handles transient overload within a single attempt.
-    if (await this.page.getByRole('heading', { name: /heavy load/i }).isVisible()) {
-      await this.page.waitForTimeout(3000);
+    if (await this.page.getByRole('heading', { name: /heavy load/i }).isVisible({timeout: 3_000})) {
       await this.page.goto(this.url);
     }
   }
