@@ -20,4 +20,4 @@ export const test = base.extend<
   },
 });
 
-export { expect } from '@playwright/test';
+export { expect, VIGNETTE_RETRY_TIMEOUT } from './test';

@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/test';
+import { test, expect, VIGNETTE_RETRY_TIMEOUT } from '../fixtures/test';
 
 test.describe('Products Page', { tag: ['@ui', '@regression'] }, () => {
   test.beforeEach(async ({ productsPage }) => {
@@ -46,7 +46,7 @@ test.describe('Products Page', { tag: ['@ui', '@regression'] }, () => {
     await expect(async () => {
       await productsPage.viewProductLinks.first().click();
       await expect(page).toHaveURL(/\/product_details\/\d+/, { timeout: 5000 });
-    }).toPass({ timeout: 20000 });
+    }).toPass({ timeout: VIGNETTE_RETRY_TIMEOUT });
     await expect(page).toHaveTitle('Automation Exercise - Product Details');
   });
 

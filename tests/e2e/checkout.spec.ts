@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/authenticated';
+import { test, expect, VIGNETTE_RETRY_TIMEOUT } from '../fixtures/authenticated';
 
 test.describe('Checkout flow (authenticated)', { tag: ['@ui', '@e2e', '@regression'] }, () => {
   test('logged-in user can purchase a product end-to-end', { tag: '@smoke' }, async ({
@@ -16,10 +16,11 @@ test.describe('Checkout flow (authenticated)', { tag: ['@ui', '@e2e', '@regressi
     // Verify cart has the item, then proceed to checkout
     await expect(page).toHaveURL(/\/view_cart/);
     await expect(cartPage.cartItems).toHaveCount(1);
-    await cartPage.proceedToCheckoutButton.click();
-
-    // Authenticated users go directly to /checkout — no login modal
-    await expect(page).toHaveURL(/\/checkout/);
+    // Unauthenticated users would see a modal; authenticated users land on /checkout directly
+    await expect(async () => {
+      await cartPage.proceedToCheckoutButton.click();
+      await expect(page).toHaveURL(/\/checkout/, { timeout: 5000 });
+    }).toPass({ timeout: VIGNETTE_RETRY_TIMEOUT });
     await expect(checkoutPage.deliveryAddress).toBeVisible();
     await expect(checkoutPage.cartInfoTable).toBeVisible();
 
@@ -54,9 +55,12 @@ test.describe('Checkout flow (authenticated)', { tag: ['@ui', '@e2e', '@regressi
     await productDetailPage.goto(1);
     await productDetailPage.addToCart();
     await productDetailPage.viewCartModalLink.click();
-    await cartPage.proceedToCheckoutButton.click();
+    await expect(page).toHaveURL(/\/view_cart/);
 
     // Unauthenticated users would see a modal; authenticated users land on /checkout directly
-    await expect(page).toHaveURL(/\/checkout/);
+    await expect(async () => {
+      await cartPage.proceedToCheckoutButton.click();
+      await expect(page).toHaveURL(/\/checkout/, { timeout: 5000 });
+    }).toPass({ timeout: VIGNETTE_RETRY_TIMEOUT });
   });
 });

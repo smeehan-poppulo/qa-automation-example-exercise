@@ -94,3 +94,10 @@ export const test = base.extend<PageFixtures>({
 });
 
 export { expect } from '@playwright/test';
+
+// Google vignette ads can intercept clicks and block navigation even when the
+// route block (above) is active, because GPT may load from an unrecognised URL
+// or the overlay may already be present before the block fires. toPass retries
+// the click + assertion until the locator handler has had a chance to dismiss
+// the overlay. The 20 s ceiling covers slow external-ad network responses.
+export const VIGNETTE_RETRY_TIMEOUT = 20_000;

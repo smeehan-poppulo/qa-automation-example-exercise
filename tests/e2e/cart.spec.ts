@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/test';
+import { test, expect, VIGNETTE_RETRY_TIMEOUT } from '../fixtures/test';
 
 test.describe('Cart Page', { tag: ['@ui', '@regression'] }, () => {
   test('shows empty cart message when no items added', async ({ cartPage }) => {
@@ -24,7 +24,7 @@ test.describe('Cart Page', { tag: ['@ui', '@regression'] }, () => {
     await expect(async () => {
       await page.getByRole('link', { name: 'here' }).click();
       await expect(page).toHaveURL(/\/products/, { timeout: 5000 });
-    }).toPass({ timeout: 20000 });
+    }).toPass({ timeout: VIGNETTE_RETRY_TIMEOUT });
   });
 
   test('shows product in cart after adding from product detail', { tag: '@smoke' }, async ({ productDetailPage, cartPage, page }) => {

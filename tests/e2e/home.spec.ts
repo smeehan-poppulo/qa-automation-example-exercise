@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/test';
+import { test, expect, VIGNETTE_RETRY_TIMEOUT } from '../fixtures/test';
 
 test.describe('Home Page', { tag: ['@ui', '@regression'] }, () => {
   test.beforeEach(async ({ homePage }) => {
@@ -33,7 +33,7 @@ test.describe('Home Page', { tag: ['@ui', '@regression'] }, () => {
     await expect(async () => {
       await homePage.navProducts.click();
       await expect(page).toHaveURL(/\/products/, { timeout: 5000 });
-    }).toPass({ timeout: 20000 });
+    }).toPass({ timeout: VIGNETTE_RETRY_TIMEOUT });
     await expect(page.getByRole('heading', { name: 'All Products' })).toBeVisible();
   });
 
@@ -41,7 +41,7 @@ test.describe('Home Page', { tag: ['@ui', '@regression'] }, () => {
     await expect(async () => {
       await homePage.navSignupLogin.click();
       await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
-    }).toPass({ timeout: 20000 });
+    }).toPass({ timeout: VIGNETTE_RETRY_TIMEOUT });
     await expect(page.getByRole('heading', { name: 'Login to your account' })).toBeVisible();
   });
 
@@ -49,7 +49,7 @@ test.describe('Home Page', { tag: ['@ui', '@regression'] }, () => {
     await expect(async () => {
       await homePage.navContactUs.click();
       await expect(page).toHaveURL(/\/contact_us/, { timeout: 5000 });
-    }).toPass({ timeout: 20000 });
+    }).toPass({ timeout: VIGNETTE_RETRY_TIMEOUT });
     await expect(page.getByRole('heading', { name: /Contact Us/i })).toBeVisible();
   });
 });
