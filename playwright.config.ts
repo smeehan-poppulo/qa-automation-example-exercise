@@ -9,9 +9,6 @@ export default defineConfig({
   workers: cpus().length,
   reporter: process.env.CI ? [['github'], ['html']] : 'html',
 
-  globalSetup: './tests/global-setup.ts',
-  globalTeardown: './tests/global-teardown.ts',
-
   use: {
     baseURL: 'https://automationexercise.com',
     trace: 'on-first-retry',
@@ -19,6 +16,14 @@ export default defineConfig({
   },
 
   projects: [
+    {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+    },
+    {
+      name: 'teardown',
+      testMatch: /auth\.teardown\.ts/,
+    },
     {
       name: 'api',
       testMatch: '**/api/**/*.spec.ts',
@@ -41,6 +46,8 @@ export default defineConfig({
     {
       name: 'authenticated-chromium',
       testMatch: '**/e2e/checkout.spec.ts',
+      dependencies: ['setup'],
+      teardown: 'teardown',
       use: { ...devices['Desktop Chrome'] },
     },
   ],

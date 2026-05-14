@@ -1,8 +1,8 @@
-import { request, FullConfig } from '@playwright/test';
+import { test as teardown, request } from '@playwright/test';
 import fs from 'fs';
-import { CREDENTIALS_PATH } from './global-setup';
+import { CREDENTIALS_PATH } from './auth-config';
 
-async function globalTeardown(config: FullConfig) {
+teardown('delete test accounts', async ({}, testInfo) => {
   if (!fs.existsSync(CREDENTIALS_PATH)) return;
 
   const accounts: { email: string; password: string }[] = JSON.parse(
@@ -10,7 +10,7 @@ async function globalTeardown(config: FullConfig) {
   );
 
   const apiContext = await request.newContext({
-    baseURL: config.projects[0].use.baseURL!,
+    baseURL: testInfo.project.use.baseURL!,
   });
 
   await Promise.all(
@@ -21,6 +21,4 @@ async function globalTeardown(config: FullConfig) {
 
   await apiContext.dispose();
   fs.rmSync(CREDENTIALS_PATH, { force: true });
-}
-
-export default globalTeardown;
+});

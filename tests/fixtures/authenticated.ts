@@ -1,7 +1,7 @@
 import { BrowserContextOptions } from '@playwright/test';
 import fs from 'fs';
 import { test as base } from './test';
-import { CREDENTIALS_PATH } from '../global-setup';
+import { CREDENTIALS_PATH } from '../auth-config';
 
 // Worker-scoped: each Playwright worker gets its own account from the pool,
 // preventing cart/session conflicts when checkout tests run in parallel.

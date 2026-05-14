@@ -1,12 +1,10 @@
-import { chromium, request, FullConfig } from '@playwright/test';
+import { test as setup, chromium, request } from '@playwright/test';
 import fs from 'fs';
+import { AUTH_DIR, CREDENTIALS_PATH } from './auth-config';
 
-const AUTH_DIR = 'playwright/.auth';
-export const CREDENTIALS_PATH = `${AUTH_DIR}/credentials.json`;
-
-async function globalSetup(config: FullConfig) {
-  const baseURL = config.projects[0].use.baseURL!;
-  const poolSize = config.workers;
+setup('create test accounts', async ({}, testInfo) => {
+  const baseURL = testInfo.project.use.baseURL!;
+  const poolSize = testInfo.config.workers;
   const password = process.env.TEST_ACCOUNT_PASSWORD ?? 'LocalDev-Only!';
 
   if (process.env.CI && !process.env.TEST_ACCOUNT_PASSWORD) {
@@ -58,7 +56,7 @@ async function globalSetup(config: FullConfig) {
       await page.locator('[data-qa="login-email"]').fill(email);
       await page.locator('[data-qa="login-password"]').fill(password);
       await page.locator('[data-qa="login-button"]').click();
-      await page.locator('a', { hasText: 'Logged in as' }).waitFor({ timeout: 15000 });
+      await page.locator('a', { hasText: 'Logged in as' }).waitFor({ timeout: 15_000 });
 
       await context.storageState({ path: `${AUTH_DIR}/user-${i}.json` });
       await browser.close();
@@ -68,6 +66,4 @@ async function globalSetup(config: FullConfig) {
   );
 
   fs.writeFileSync(CREDENTIALS_PATH, JSON.stringify(accounts));
-}
-
-export default globalSetup;
+});

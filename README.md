@@ -135,9 +135,9 @@ Unauthenticated tests are fully isolated by default (each test gets its own brow
 
 The authenticated checkout tests share session state, which would cause cart conflicts if the same account were used by multiple workers simultaneously. This is solved with a **user pool**:
 
-- `globalSetup` creates one ephemeral account per worker in parallel (via the `createAccount` API), logs each in via a real browser, and saves a `storageState` file per worker (`playwright/.auth/user-{i}.json`).
+- A `setup` project (`auth.setup.ts`) runs before `authenticated-chromium` and creates one ephemeral account per worker in parallel (via the `createAccount` API), logs each in via a real browser, and saves a `storageState` file per worker (`playwright/.auth/user-{i}.json`).
 - A worker-scoped fixture (`workerStorageState`) assigns each worker its own account using `workerIndex % poolSize`, injected via Playwright's `contextOptions` fixture so it threads through the standard context → page chain without duplicating any setup.
-- `globalTeardown` deletes all accounts in parallel via the `deleteAccount` API and removes the credentials file.
+- A `teardown` project (`auth.teardown.ts`) is linked to `authenticated-chromium` via `teardown:` and deletes all accounts in parallel via the `deleteAccount` API and removes the credentials file.
 
 The pool size is derived automatically from `config.workers`, so it always matches the actual concurrency level.
 
@@ -170,8 +170,9 @@ tests/
     login.spec.ts
     contact.spec.ts
     checkout.spec.ts
-  global-setup.ts           Creates ephemeral user pool, saves storageState per worker
-  global-teardown.ts        Deletes all ephemeral accounts, cleans up credentials file
+  auth-config.ts            Shared constants (AUTH_DIR, CREDENTIALS_PATH)
+  auth.setup.ts             Setup project — creates ephemeral user pool, saves storageState per worker
+  auth.teardown.ts          Teardown project — deletes all ephemeral accounts, cleans up credentials file
 playwright/.auth/           Gitignored — storageState files written by global setup
 .env.example                Documents required environment variables
 ```
@@ -198,7 +199,7 @@ The workflow lives at `.github/workflows/ci.yml` and runs on every push to `main
 
 ### Setup required
 
-1. Add `TEST_ACCOUNT_PASSWORD` as a repository secret in **Settings → Secrets and variables → Actions**. This is the password used when creating ephemeral test accounts in global setup.
+1. Add `TEST_ACCOUNT_PASSWORD` as a repository secret in **Settings → Secrets and variables → Actions**. This is the password used when creating ephemeral test accounts in the setup project (`auth.setup.ts`).
 
 2. Enable GitHub Pages in **Settings → Pages → Build and deployment**, set the source to **GitHub Actions**. No branch or folder selection is needed — the workflow handles publishing via `actions/deploy-pages`.
 
