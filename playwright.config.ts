@@ -1,6 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 import { cpus } from 'os';
 
+const browsers = [
+  { name: 'chromium', device: 'Desktop Chrome' },
+  { name: 'firefox', device: 'Desktop Firefox' },
+  { name: 'webkit',  device: 'Desktop Safari' },
+];
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -28,27 +34,17 @@ export default defineConfig({
       name: 'api',
       testMatch: '**/api/**/*.spec.ts',
     },
-    {
-      name: 'chromium',
+    ...browsers.map(({ name, device }) => ({
+      name,
       testIgnore: ['**/api/**/*.spec.ts', '**/e2e/checkout.spec.ts'],
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      testIgnore: ['**/api/**/*.spec.ts', '**/e2e/checkout.spec.ts'],
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      testIgnore: ['**/api/**/*.spec.ts', '**/e2e/checkout.spec.ts'],
-      use: { ...devices['Desktop Safari'] },
-    },
-    {
-      name: 'authenticated-chromium',
+      use: { ...devices[device] },
+    })),
+    ...browsers.map(({ name, device }) => ({
+      name: `authenticated-${name}`,
       testMatch: '**/e2e/checkout.spec.ts',
       dependencies: ['setup'],
       teardown: 'teardown',
-      use: { ...devices['Desktop Chrome'] },
-    },
+      use: { ...devices[device] },
+    })),
   ],
 });
